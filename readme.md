@@ -121,6 +121,9 @@ Task 1:
         3. Get list of all tasks
         4. Get one task by ID
         4. Delete one task by ID
-
+    BONUS: 
+        1. This should be a new project
+        2. The code should be modularized
+        3. It should be well commented
 
     
