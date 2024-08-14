@@ -65,7 +65,7 @@ Class 2 + Class 3:
         U => Update => PUT || PATCH [DONE]
         D => Delete => DELETE [DONE]
 
-mongodb+srv://nodejs103:nodejs103@nodejs103.cypcy.mongodb.net/
+
 Class 4: 
     - MongoDB
         -atlas => create account => project create => cluster create [DONE]
@@ -75,7 +75,21 @@ Class 4:
         - mongoose
         - create middleware
     - Learn environmental variables
-
+    - Learn .gitignore
+    - Modularization
+    - Create [DONE]
+        - Create a user in mongodb
+            -create a model
+            -create a route
+            -create a post req
+    - Read => GET [DONE]
+        - Get all users [DONE]
+        - Get one user [DONE]
+    - Update => PUT [DONE]
+        - Update one user [DONE]
+            - Learn about {new: true} flag [DONE]
+    - Delete => DELETE [DONE]
+        - Delete one user
 
         User
             fName => John
@@ -100,7 +114,13 @@ Commands:
     npm i mongoose --save
     npm i dotenv --save
 
-
+Task 1:
+    Create a simple Todo App server:
+        1. Create a task
+        2. Update a task by ID
+        3. Get list of all tasks
+        4. Get one task by ID
+        4. Delete one task by ID
 
 
     
