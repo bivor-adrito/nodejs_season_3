@@ -94,6 +94,22 @@ Class 4:
         User
             fName => John
             lName => Doe
+    
+    - Authentication 
+        - Step 1: Adjust the create user
+            --User--
+            fname => John
+            lname => Doe
+            email 
+            password => Never directly save to database => always encrypt password
+        - Step 2: Login
+            1. There will be 2 types
+                a. Email
+                    - email + password
+                b. Refresh
+
+
+
 
 
 Rules:
@@ -113,8 +129,9 @@ Commands:
     npm i body-parser --save
     npm i mongoose --save
     npm i dotenv --save
+    npm i bcrypt --save
 
-Task 1:
+Task 1: Next Sunday
     Create a simple Todo App server:
         1. Create a task
         2. Update a task by ID
