@@ -106,7 +106,13 @@ Class 4:
             1. There will be 2 types
                 a. Email
                     - email + password
+                    if email and password are verified => return => accessToken and refreshToken
                 b. Refresh
+
+        - JWT - Access token and Refresh Token
+            - Json Web Token
+
+
 
 
 
@@ -130,6 +136,7 @@ Commands:
     npm i mongoose --save
     npm i dotenv --save
     npm i bcrypt --save
+    npm i jsonwebtoken --save
 
 Task 1: Next Sunday
     Create a simple Todo App server:
@@ -143,4 +150,16 @@ Task 1: Next Sunday
         2. The code should be modularized
         3. It should be well commented
 
-    
+
+
+Class 45: [DONE]
+    1. Previous Class => Mongodb user create
+
+    read [DONE]
+    update [DONE]
+    delete [DONE]
+
+Class 42: [DONE]
+    1. How to use debugger
+
+Check Projects

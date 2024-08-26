@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const User = require("../../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
+const authenticateToken = require('../../middleware/auth')
 
 //? Create a user
 router.post("/", async (req, res) => {
@@ -33,7 +35,23 @@ router.post("/login", async (req, res) => {
       } else {
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (isValidPassword) {
-          res.json(user);
+          const accessToken = jwt.sign({
+            email: user.email,
+            _id: user._id
+          }, process.env.JWT_SECRET,{
+            expiresIn: '1m'
+          })
+          const refreshToken = jwt.sign({
+            email: user.email,
+            _id: user._id
+          }, process.env.JWT_SECRET,{
+            expiresIn: '3d'
+          })
+          const userObj = user.toJSON()
+          userObj['accessToken']=accessToken
+          userObj['refreshToken']=refreshToken
+          res.json(userObj);
+          //todo     
         } else {
           res.status(401).json({ message: "Unable to Login" });
         }
@@ -55,6 +73,21 @@ router.get("/", async (req, res) => {
   }
 });
 
+//? Get user profile
+router.get("/profile", authenticateToken, async (req, res) => {
+  try {
+    const id = req.user._id;
+    const user = await User.findById(id);
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
 //? Get one user
 router.get("/:id", async (req, res) => {
   try {
@@ -69,6 +102,7 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
+
 
 //? Update one user
 router.put("/:id", async (req, res) => {
