@@ -55,7 +55,7 @@ Overview:
 
     - SQL
 
-Class 2 + Class 3: 
+ 
     - First Req
     - Learn CRUD operation
         C => Create => POST [DONE]
@@ -66,7 +66,7 @@ Class 2 + Class 3:
         D => Delete => DELETE [DONE]
 
 
-Class 4: 
+
     - MongoDB
         -atlas => create account => project create => cluster create [DONE]
             NOTE: save the user name and password
@@ -96,14 +96,14 @@ Class 4:
             lName => Doe
     
     - Authentication 
-        - Step 1: Adjust the create user
+        - Step 1: Adjust the create user [DONE]
             --User--
             fname => John
             lname => Doe
             email 
             password => Never directly save to database => always encrypt password
         - Step 2: Login
-            1. There will be 2 types
+            1. There will be 2 types [DONE]
                 a. Email
                     - email + password
                     if email and password are verified => return => accessToken and refreshToken
@@ -111,6 +111,8 @@ Class 4:
 
         - JWT - Access token and Refresh Token
             - Json Web Token
+
+    - Refactoring [DONE]
 
 
 
