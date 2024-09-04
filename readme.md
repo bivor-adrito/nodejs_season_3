@@ -116,7 +116,8 @@ Overview:
 
     - ToDo app with authentication
 
-    - MongoDB Aggregation
+    - MongoDB Aggregation [Done]
+        - How to paginate and filter data
 
 
 
