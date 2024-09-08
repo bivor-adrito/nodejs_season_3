@@ -3,6 +3,7 @@ const router = express.Router();
 const Task = require("../../models/Task");
 const authenticateToken = require("../../middleware/auth");
 const { default: mongoose } = require("mongoose");
+const { body, validationResult } = require("express-validator");
 
 //? Create a new Task
 router.post("/", authenticateToken, async (req, res) => {
@@ -26,7 +27,7 @@ router.post("/", authenticateToken, async (req, res) => {
 router.get("/", authenticateToken, async (req, res) => {
   try {
     let userId = req.user._id;
-    userId = new mongoose.Types.ObjectId(userId)
+    userId = new mongoose.Types.ObjectId(userId);
 
     let current = req?.query?.current ?? "1";
     current = parseInt(current);
@@ -40,7 +41,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
     pipeline.push({
       $match: {
-        userId: userId
+        userId: userId,
       },
     });
     //? filter by title
@@ -86,13 +87,13 @@ router.get("/", authenticateToken, async (req, res) => {
     });
 
     pipeline.push({
-        $lookup: {
-            from: 'users',
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'user'
-        }
-    })
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "user",
+      },
+    });
     const tasks = await Task.aggregate(pipeline);
     res.json(tasks);
   } catch (error) {
@@ -117,5 +118,69 @@ router.get("/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
+
+//? Update One of my tasks
+router.put(
+  "/:id",
+  [
+    authenticateToken,
+    [
+      body("status", "status is required").notEmpty(),
+      body("status", "give a valid status").isIn([
+        "to-do",
+        "in-progress",
+        "complete",
+      ]),
+      body("title", "title is required").notEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+      }
+      const id = req.params.id;
+      const userId = req.user._id;
+      const taskObj = {
+        title: req.body.title,
+        description: req.body.description ?? "",
+        status: req.body.status,
+        userId: userId,
+      };
+      const updateTask = await Task.findByIdAndUpdate(
+        { _id: id, userId: userId },
+        taskObj,
+        { new: true }
+      );
+      if (updateTask) {
+        res.json(updateTask);
+      } else {
+        res.status(404).json({ message: "Task not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+);
+
+//? Delete my tasks
+router.delete('/:id', authenticateToken, async(req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = req.user._id;
+        const deletedTask = await Task.findOneAndDelete({_id: id, userId: userId})
+        if(deletedTask){
+            res.json({message: "The task is deleted"})
+        }else{
+        res.status(404).json({ message: "Task not found" });
+
+        }
+        
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong" });
+        
+    }
+})
 
 module.exports = router;

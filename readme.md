@@ -119,6 +119,9 @@ Overview:
     - MongoDB Aggregation [Done]
         - How to paginate and filter data
 
+    - How to validate a request
+        - express-validator
+
 
 
 
@@ -145,6 +148,7 @@ Commands:
     npm i dotenv --save
     npm i bcrypt --save
     npm i jsonwebtoken --save
+    npm i express-validator --save
 
 Task 1: Next Sunday
     Create a simple Todo App server:
