@@ -176,7 +176,7 @@ Overview:
             purchaseDate: Date,
             deliveryLocation: string,
             expectedDeliveryDate: Date,
-            deliveryStatus: [delivered, in-progress]
+            deliveryStatus: [delivered, in-progress, canceled]
         }
 
 
