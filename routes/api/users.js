@@ -4,25 +4,59 @@ const User = require("../../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authenticateToken = require("../../middleware/auth");
+const { body, validationResult } = require("express-validator");
 
 //? Create a user
-router.post("/", async (req, res) => {
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(req.body.password, salt);
-    const userObj = {
-      fname: req.body.fname,
-      lname: req.body.lname,
-      email: req.body.email,
-      password: hash,
-    };
-    const user = new User(userObj);
-    await user.save();
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
+router.post(
+  "/",
+  [
+    body("fname", "First name is required").notEmpty(),
+    body("lname", "Last name is required").notEmpty(),
+    body("email", "Please enter a valid email").isEmail(),
+    body("email", "Email is required").notEmpty(),
+    body("password", "Password is required").notEmpty(),
+    body("password", "Password must be at least 8 characters long").isLength({
+      min: 8,
+    }),
+    body(
+      "password",
+      "Password must contain at least one uppercase letter"
+    ).matches("[A-Z]", "g"),
+    body(
+      "password",
+      "Password must contain at least one lowercase letter"
+    ).matches("[a-z]", "g"),
+    body("password", "Password must contain at least one number").matches(
+      "[0-9]",
+      "g"
+    ),
+    body("userType", "userType is required").notEmpty(),
+    body("userType", "give a valid userType").isIn(["customer", "admin"]),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+      }else{
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(req.body.password, salt);
+        const userObj = {
+          fname: req.body.fname,
+          lname: req.body.lname,
+          email: req.body.email,
+          password: hash,
+          userType: req.body.userType ?? "customer",
+        };
+        const user = new User(userObj);
+        await user.save();
+        res.status(201).json(user);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong" });
+    }
   }
-});
+);
 
 //? Login a user
 router.post("/login", async (req, res) => {
@@ -164,6 +198,7 @@ function generateTokens(user) {
     {
       email: user.email,
       _id: user._id,
+      userType: user.userType,
     },
     process.env.JWT_SECRET,
     {
@@ -174,6 +209,7 @@ function generateTokens(user) {
     {
       email: user.email,
       _id: user._id,
+      userType: user.userType,
     },
     process.env.JWT_SECRET,
     {
@@ -182,4 +218,3 @@ function generateTokens(user) {
   );
   return { accessToken, refreshToken };
 }
-
