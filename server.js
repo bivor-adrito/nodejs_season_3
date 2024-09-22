@@ -12,6 +12,7 @@ connectDB()
 //? routes
 app.use('/api/users', require('./routes/api/users'))
 app.use('/api/tasks', require('./routes/api/tasks'))
+app.use('/api/products', require('./routes/api/products'))
 
 //? To Check if the app is running
 app.get('/', (req, res) => {

@@ -124,13 +124,13 @@ Overview:
 
     - One Vendor Marketplace
     Features
-        1. There will be two types of users
+        1. There will be two types of users [DONE]
             a. Admin
             b. Customer
 
         - Admins will be able to do the followings
-            1. Admin will be able to create a product
-            2. Admin will be able to upload an image on the product
+            1. Admin will be able to create a product [DONE]
+            2. Admin will be able to upload an image on the product [DONE]
             3. Admin will be able to update a product
             4. Admin will be able to see all the products
             5. Admin will be able to see a specific product
@@ -208,6 +208,7 @@ Commands:
     npm i bcrypt --save
     npm i jsonwebtoken --save
     npm i express-validator --save
+    npm install --save multer
 
 Task 1: Next Sunday
     Create a simple Todo App server:

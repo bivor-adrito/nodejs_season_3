@@ -46,7 +46,7 @@ router.post(
           lname: req.body.lname,
           email: req.body.email,
           password: hash,
-          userType: req.body.userType ?? "customer",
+          userType: req?.body?.userType ?? "customer",
         };
         const user = new User(userObj);
         await user.save();
