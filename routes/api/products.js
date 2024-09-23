@@ -87,4 +87,126 @@ router.post(
   }
 );
 
+//* Get all products
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    let current = req?.query?.current ?? "1";
+    current = parseInt(current);
+    let pageSize = req?.query?.pageSize ?? "10";
+    pageSize = parseInt(pageSize);
+    let sort = req?.query?.sort ?? "asc";
+
+    const pipeline = [];
+
+    pipeline.push({
+      $match: {
+        isDeleted: false
+      },
+    });
+    //? sort data by creation time
+    switch (sort) {
+      case "asc":
+        pipeline.push({
+          $sort: {
+            createdAt: 1,
+          },
+        });
+        break;
+      case "desc":
+        pipeline.push({
+          $sort: {
+            createdAt: -1,
+          },
+        });
+        break;
+    }
+
+    //? for pagination
+    pipeline.push({
+      $skip: (current - 1) * pageSize,
+    });
+    pipeline.push({
+      $limit: pageSize * 1,
+    });
+
+    pipeline.push({
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "users",
+      },
+    });
+    pipeline.push({
+      $lookup: {
+        from: "files",
+        localField: "fileId",
+        foreignField: "_id",
+        as: "file",
+      },
+    });
+    const products = await Product.aggregate(pipeline);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+//? Get One Product
+router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const product = await Product.findById(id)
+      .populate(["fileId", "userId"])
+      .exec();
+    if (product) {
+      res.json(product);
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+//? Update one product
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.userType != "admin") {
+      return res.status(403).json({ message: "You are not an admin" });
+    }
+
+    const id = req.params.id;
+    const body = req.body;
+    const updatedProduct = await Product.findByIdAndUpdate(id, body, {
+      new: true,
+    });
+    if (updatedProduct) {
+      return res.json(updatedProduct);
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+//? Amend a product
+router.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.userType != "admin") {
+      return res.status(403).json({ message: "You are not an admin" });
+    }
+    const id = req.params.id;
+    const amendedProduct = await Product.findByIdAndUpdate(id, {isDeleted: true}, {new: true})
+    if (amendedProduct) {
+        return res.json(amendedProduct);
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
 module.exports = router;
