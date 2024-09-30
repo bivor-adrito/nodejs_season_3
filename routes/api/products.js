@@ -155,7 +155,7 @@ router.get("/", authenticateToken, async (req, res) => {
 //? Get One Product
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    const id = req.params.id;
+const id = req.params.id;
     const product = await Product.findById(id)
       .populate(["fileId", "userId"])
       .exec();
