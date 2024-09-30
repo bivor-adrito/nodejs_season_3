@@ -134,20 +134,25 @@ Overview:
             3. Admin will be able to update a product [DONE]
             4. Admin will be able to see all the products [Done]
             5. Admin will be able to see a specific product [DONE]
-            6. Admin will be able to delete [amend] a product
-            6. Admin will be able to make change to an order
+            6. Admin will be able to delete [amend] a product [Done]
+            7. Admin will be able to see a specific order [Done]
+            8. Admin will be able to make change to an order [Done]
+            9. Admin will be able to update status of a order [Done]
+            10. Admin will be able to delete an order [DONE]
+
 
         - Customers will be able to do the followings
             1. Customers will be able to see all the products [DONE]
             2. Customers will be able to see the details of a product [DONE]
-            3. Customers will be able to make an order
-            3. Customers will be able to cancel an order
+            3. Customers will be able to make an order [DONE]
+            4. Customers will be able to see a specific order [DONE]          
+            5. Customers will be able to cancel an order [DONE]
 
         - Customers will NOT be able to do the followings
             1. Customers will not be able to create a product [DONE]
             2. Customers will not be able to upload an image on the product [DONE]
             3. Customers will not be able to update a product [DONE]
-            4. Customers will not be able to delete a product
+            4. Customers will not be able to delete a product [DONE]
     
     Database structure and changes: 
 

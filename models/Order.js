@@ -19,7 +19,7 @@ const OrderSchema = new mongoose.Schema({
     deliveryStatus:{
         type: String, 
         enum: ['delivered', 'in-progress', 'canceled'],
-        default: 'to-do'
+        default: 'in-progress'
     },
     userId:{
         type: mongoose.Schema.Types.ObjectId,
