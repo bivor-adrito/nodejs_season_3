@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../../models/User");
+// const User = require("../../models/User");
+const User = require('../../repositories/user.repository')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authenticateToken = require("../../middleware/auth");
@@ -48,8 +49,9 @@ router.post(
           password: hash,
           userType: req?.body?.userType ?? "customer",
         };
-        const user = new User(userObj);
-        await user.save();
+        // const user = new User(userObj);
+        // await user.save();
+        const user = await User.create(userObj);
         res.status(201).json(user);
       }
     } catch (error) {
@@ -63,7 +65,7 @@ router.post("/login", async (req, res) => {
   try {
     const { type, email, password, refreshToken } = req.body;
     if (type == "email") {
-      const user = await User.findOne({ email: email });
+      const user = await User.findOne('email', email);
       if (!user) {
         res.status(404).json({ message: "User not found" });
       } else {
@@ -129,9 +131,7 @@ router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const userBody = req.body;
-    const updateUser = await User.findByIdAndUpdate(id, userBody, {
-      new: true,
-    });
+    const updateUser = await User.update(id, userBody);
     if (updateUser) {
       res.json(updateUser);
     } else {
@@ -189,7 +189,8 @@ function handleRefreshToken(refreshToken, res) {
 function generateUserObject(user) {
   const { accessToken, refreshToken } = generateTokens(user);
 
-  const userObj = user.toJSON();
+  // const userObj = user.toJSON();
+  const userObj = user;
   userObj["accessToken"] = accessToken;
   userObj["refreshToken"] = refreshToken;
   return userObj;
@@ -199,8 +200,8 @@ function generateTokens(user) {
   const accessToken = jwt.sign(
     {
       email: user.email,
-      _id: user._id,
-      userType: user.userType,
+      _id: user.id,
+      userType: user.usertype,
     },
     process.env.JWT_SECRET,
     {
@@ -210,8 +211,8 @@ function generateTokens(user) {
   const refreshToken = jwt.sign(
     {
       email: user.email,
-      _id: user._id,
-      userType: user.userType,
+      _id: user.id,
+      userType: user.usertype,
     },
     process.env.JWT_SECRET,
     {

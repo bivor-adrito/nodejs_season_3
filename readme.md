@@ -214,6 +214,7 @@ Commands:
     npm i jsonwebtoken --save
     npm i express-validator --save
     npm install --save multer
+    npm i pg --save
 
 Task 1: Next Sunday
     Create a simple Todo App server:
@@ -240,3 +241,6 @@ Class 42: [DONE]
     1. How to use debugger
 
 Check Projects
+
+Docker-Command
+    docker-compose up -d

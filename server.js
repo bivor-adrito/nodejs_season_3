@@ -3,11 +3,13 @@ const express = require('express');
 const app = express()
 const bodyParser = require('body-parser')
 const connectDB = require('./config/db')
+const connectPgDb = require('./config/pgDb')
 
 //? Parse requests
 app.use(bodyParser.json())
 
 connectDB()
+connectPgDb()
 
 //? routes
 app.use('/api/users', require('./routes/api/users'))

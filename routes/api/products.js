@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../../models/Product");
-const File = require("../../models/File");
+// const Product = require("../../models/Product");
+const Product = require("../../repositories/product.repository");
+// const File = require("../../models/File");
+const File = require('../../repositories/file.repository')
 const authenticateToken = require("../../middleware/auth");
 const { body, validationResult } = require("express-validator");
 const multer = require("multer");
@@ -31,8 +33,10 @@ router.post(
       name: req.file.filename,
       path: req.file.path,
     };
-    const file = new File(fileObj);
-    await file.save();
+    // const file = new File(fileObj);
+    // await file.save();
+    const file = await File.create(fileObj);
+
     res.status(201).json(file);
   }
 );
@@ -72,12 +76,11 @@ router.post(
         fileId: req.body.fileId,
         userId: userId,
       };
-      const product = new Product(productObj);
-      await product.save();
-      if (product?.fileId) {
-        const createdProduct = await Product.findById(product._id)
-          .populate(["userId", "fileId"])
-          .exec();
+      // const product = new Product(productObj);
+      // await product.save();
+      const product = await Product.create(productObj);
+      if (product?.file_id) {
+        const createdProduct = await Product.findByIdPopulated(product.id)
         return res.status(201).json(createdProduct);
       }
       res.status(201).json(product);
