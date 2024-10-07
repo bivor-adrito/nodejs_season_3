@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../../models/Product");
-const Order = require("../../models/Order");
+// const Product = require("../../models/Product");
+const Product = require("../../repositories/product.repository");
+const Order = require("../../repositories/order.repository");
 const authenticateToken = require("../../middleware/auth");
 const { body, validationResult } = require("express-validator");
 const { default: mongoose } = require("mongoose");
@@ -30,20 +31,26 @@ router.post(
         return res.status(404).json({ message: "Product not found" });
       } else {
         const now = new Date();
+        const expectedDeliveryDate = new Date(now)
+        expectedDeliveryDate.setDate(now.getDate() + 5)
         const orderObj = {
           userId: userId,
           productId: productId,
           qty: parseInt(req.body.qty) || 1,
           purchaseDate: now,
-          expectedDeliveryDate: now.setDate(now.getDate() + 5),
+          expectedDeliveryDate: expectedDeliveryDate,
           deliveryLocation: req.body.deliveryLocation,
           deliveryStatus: "in-progress",
         };
         orderObj.total = orderObj.qty * product.price;
 
-        const order = new Order(orderObj);
-        await (await order.save()).populate(["productId", "userId"]);
-
+        // const order = new Order(orderObj);
+        // await (await order.save()).populate(["productId", "userId"]);
+        const order = await Order.create(orderObj)
+        if(order?.product_id){
+          const createdOrder = await Order.findByIdPopulated(order.id)
+          return res.status(201).json(createdOrder);
+        }
         return res.status(201).json(order);
       }
     } catch (error) {
@@ -61,95 +68,11 @@ router.get("/", authenticateToken, async (req, res) => {
     pageSize = parseInt(pageSize);
     let sort = req?.query?.sort ?? "asc";
 
-    const pipeline = [];
+    const userId = req.user._id
 
-    pipeline.push({
-      $match: {
-        userId: new mongoose.Types.ObjectId(req.user._id),
-      },
-    });
-    //? sort data by creation time
-    switch (sort) {
-      case "asc":
-        pipeline.push({
-          $sort: {
-            createdAt: 1,
-          },
-        });
-        break;
-      case "desc":
-        pipeline.push({
-          $sort: {
-            createdAt: -1,
-          },
-        });
-        break;
-    }
+    const orders = await Order.findAllByUserId(userId, pageSize, current, sort)
 
-    //? for pagination
-    pipeline.push({
-      $skip: (current - 1) * pageSize,
-    });
-    pipeline.push({
-      $limit: pageSize * 1,
-    });
-
-    pipeline.push({
-      $lookup: {
-        from: "users",
-        localField: "userId",
-        foreignField: "_id",
-        as: "users",
-      },
-    });
-    pipeline.push({
-      $lookup: {
-        from: "products",
-        localField: "productId",
-        foreignField: "_id",
-        as: "product",
-      },
-    });
-    const orders = await Order.aggregate(pipeline);
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-  }
-});
-
-//? Get details of a order admin
-router.get("/admin/:id", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.userType != "admin") {
-      return res.status(403).json({ message: "Unauthorized" });
-    }
-    const order = await Order.findById(req.params.id)
-      .populate(["userId", "productId"])
-      .exec();
-    if (order) {
-      return res.json(order);
-    } else {
-      return res.status(404).json({ message: "Order not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-  }
-});
-
-//? Get my order
-router.get("/:id", authenticateToken, async (req, res) => {
-  try {
-    const order = await Order.findOne({
-      _id: req.params.id,
-      userId: req.user._id,
-    })
-      .populate(["userId", "productId"])
-      .exec();
-    if (order) {
-      return res.json(order);
-    } else {
-      return res.status(404).json({ message: "Order not found" });
-    }
+    return res.json(orders)
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
